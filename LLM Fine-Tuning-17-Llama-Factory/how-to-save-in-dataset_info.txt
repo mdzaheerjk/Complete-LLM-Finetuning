@@ -1,0 +1,22 @@
+{
+  "my_dataset": {
+    "format": "alpaca",
+    "path": "data/my_dataset/my_data.json",
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "response": "output"
+    }
+  }
+}
+
+
+{
+  "my_dataset": {
+    "format": "sharegpt",
+    "path": "data/my_dataset/my_data.json",
+    "columns": {
+      "messages": "conversations"
+    }
+  }
+}

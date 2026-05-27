@@ -1,0 +1,7 @@
+[
+  {
+    "instruction": "Write a Python function",
+    "input": "Function should reverse a string",
+    "output": "def reverse_str(s): return s[::-1]"
+  }
+]

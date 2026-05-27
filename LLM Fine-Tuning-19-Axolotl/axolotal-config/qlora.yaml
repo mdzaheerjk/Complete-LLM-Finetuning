@@ -1,0 +1,8 @@
+# qlora.yaml (changes only)
+
+load_in_4bit: true
+bnb_4bit_compute_dtype: float16
+bnb_4bit_quant_type: nf4
+
+adapter: qlora
+optimizer: paged_adamw_8bit

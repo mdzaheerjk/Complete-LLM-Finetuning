@@ -1,0 +1,11 @@
+# dpo.yaml (changes only)
+
+training_type: dpo
+
+# Preference dataset
+datasets:
+  - path: argilla/ultrafeedback-binarized
+    type: preference
+
+# DPO specific params
+dpo_beta: 0.1

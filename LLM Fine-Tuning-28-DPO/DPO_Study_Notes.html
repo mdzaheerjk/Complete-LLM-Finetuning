@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DPO Study Notes – Direct Preference Optimization</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Fraunces:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0e0e12;
+    --bg2: #16161e;
+    --bg3: #1e1e2a;
+    --border: #2e2e3e;
+    --text: #e8e6f0;
+    --muted: #9896a8;
+    --accent: #a78bfa;
+    --accent2: #f9a8d4;
+    --accent3: #6ee7b7;
+    --accent4: #fde68a;
+    --red: #f87171;
+    --blue: #60a5fa;
+    --orange: #fb923c;
+    --mono: 'IBM Plex Mono', monospace;
+    --serif: 'Fraunces', serif;
+    --sans: 'DM Sans', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.7;
+    padding: 0 0 80px;
+  }
+
+  /* HERO */
+  .hero {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 56px 48px 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 60% at 80% -10%, rgba(167,139,250,0.12) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 10% 110%, rgba(110,231,183,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--accent3);
+    text-transform: uppercase;
+    background: rgba(110,231,183,0.1);
+    border: 1px solid rgba(110,231,183,0.25);
+    padding: 4px 10px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #e8e6f0 0%, var(--accent) 60%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-sub {
+    color: var(--muted);
+    font-size: 17px;
+    max-width: 600px;
+    margin-bottom: 28px;
+  }
+  .hero-meta {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .hero-meta span {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .hero-meta strong {
+    color: var(--accent4);
+    font-weight: 600;
+  }
+
+  /* LAYOUT */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 48px;
+  }
+
+  /* SECTION HEADERS */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 52px 0 24px;
+  }
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(167,139,250,0.12);
+    border: 1px solid rgba(167,139,250,0.25);
+    padding: 3px 8px;
+    border-radius: 3px;
+    min-width: 36px;
+    text-align: center;
+  }
+  .section-header h2 {
+    font-family: var(--serif);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .card p {
+    color: #c8c6d8;
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  /* KEY INSIGHT BOX */
+  .insight {
+    background: rgba(167,139,250,0.07);
+    border: 1px solid rgba(167,139,250,0.3);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin: 16px 0;
+    font-size: 15px;
+    color: #d4d0e8;
+    line-height: 1.7;
+  }
+  .insight strong {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* EQUATION BLOCK */
+  .eq-block {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin: 16px 0;
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--accent4);
+    overflow-x: auto;
+    line-height: 1.8;
+  }
+  .eq-block .comment {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  /* COMPARISON TABLE */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  .compare-table th {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    text-transform: uppercase;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+  .compare-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(46,46,62,0.6);
+    color: #c8c6d8;
+    vertical-align: top;
+  }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table .col-rlhf { color: var(--red); }
+  .compare-table .col-dpo  { color: var(--accent3); }
+  .tag-bad  { background: rgba(248,113,113,0.12); color: var(--red); border: 1px solid rgba(248,113,113,0.25); padding: 2px 8px; border-radius: 4px; font-size: 12px; font-family: var(--mono); }
+  .tag-good { background: rgba(110,231,183,0.12); color: var(--accent3); border: 1px solid rgba(110,231,183,0.25); padding: 2px 8px; border-radius: 4px; font-size: 12px; font-family: var(--mono); }
+
+  /* STEPS */
+  .steps { margin: 16px 0; }
+  .step {
+    display: flex;
+    gap: 18px;
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(46,46,62,0.5);
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    font-family: var(--mono);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--accent);
+    min-width: 32px;
+    padding-top: 2px;
+  }
+  .step-body h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .step-body p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+
+  /* RESULT PILLS */
+  .results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+    margin: 16px 0;
+  }
+  .result-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 16px;
+    text-align: center;
+  }
+  .result-card .metric {
+    font-family: var(--serif);
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 6px;
+  }
+  .result-card .label {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  /* CODE BLOCK */
+  .code-block {
+    background: #12121a;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    font-family: var(--mono);
+    font-size: 13px;
+    overflow-x: auto;
+    line-height: 1.7;
+    margin: 16px 0;
+  }
+  .kw   { color: #c084fc; }
+  .fn   { color: #60a5fa; }
+  .str  { color: #86efac; }
+  .cmt  { color: #4b5563; }
+  .var  { color: var(--text); }
+  .op   { color: var(--accent4); }
+  .num  { color: #fb923c; }
+
+  /* CALLOUT */
+  .callout {
+    display: flex;
+    gap: 14px;
+    background: rgba(249,168,212,0.06);
+    border: 1px solid rgba(249,168,212,0.2);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 16px 0;
+  }
+  .callout-icon { font-size: 18px; flex-shrink: 0; padding-top: 2px; }
+  .callout-body { font-size: 14px; color: #d4d0e8; line-height: 1.65; }
+  .callout-body strong { color: var(--accent2); }
+
+  /* DIVIDER */
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+  /* TOC */
+  .toc {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px 28px;
+    margin: 36px 0 0;
+    font-size: 14px;
+  }
+  .toc-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .toc ol {
+    padding-left: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 24px;
+  }
+  .toc li { color: var(--muted); line-height: 1.6; }
+  .toc li::marker { color: var(--accent); }
+
+  @media (max-width: 640px) {
+    .hero { padding: 36px 24px 32px; }
+    .hero h1 { font-size: 32px; }
+    .container { padding: 0 24px; }
+    .results-grid { grid-template-columns: 1fr 1fr; }
+    .toc ol { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="container">
+    <div class="hero-tag">NeurIPS 2023 · Stanford University</div>
+    <h1>Direct Preference<br/>Optimization (DPO)</h1>
+    <p class="hero-sub">Your language model is secretly a reward model. A concise study guide for understanding DPO — the simpler, stronger alternative to RLHF.</p>
+    <div class="hero-meta">
+      <span><strong>Authors:</strong> Rafailov, Sharma, Mitchell, Ermon, Manning, Finn</span>
+      <span><strong>Paper:</strong> arXiv 2305.18290v3</span>
+      <span><strong>Venue:</strong> NeurIPS 2023</span>
+    </div>
+    <div class="toc">
+      <div class="toc-title">Table of contents</div>
+      <ol>
+        <li>The problem with RLHF</li>
+        <li>The core DPO insight</li>
+        <li>The math, simplified</li>
+        <li>The DPO loss function</li>
+        <li>How the gradient works</li>
+        <li>DPO pipeline in practice</li>
+        <li>Experimental results</li>
+        <li>The PyTorch implementation</li>
+        <li>Limitations &amp; future work</li>
+        <li>Key takeaways</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="container">
+
+  <!-- SECTION 1 -->
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2>The problem with RLHF</h2>
+  </div>
+
+  <p style="color:var(--muted); font-size:15px; margin-bottom:18px;">Before DPO, the standard recipe for aligning LLMs with human preferences was Reinforcement Learning from Human Feedback (RLHF). Here's why that's painful:</p>
+
+  <div class="card">
+    <div class="card-title">The RLHF pipeline — 3 expensive stages</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1.</div>
+        <div class="step-body">
+          <h4>Supervised Fine-Tuning (SFT)</h4>
+          <p>Fine-tune a pre-trained LM on high-quality demonstration data to get a baseline policy π<sub>SFT</sub>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2.</div>
+        <div class="step-body">
+          <h4>Reward Model Training</h4>
+          <p>Collect human preference pairs (y_win vs y_lose) and train a separate reward model r_φ(x, y) via binary cross-entropy to predict which response is better.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3.</div>
+        <div class="step-body">
+          <h4>RL Fine-Tuning with PPO</h4>
+          <p>Use Proximal Policy Optimization (PPO) to maximize the learned reward while keeping the policy close to π<sub>SFT</sub> via a KL-divergence penalty. This requires sampling from the LM in the training loop — extremely expensive.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">⚠️</div>
+    <div class="callout-body"><strong>Core problem:</strong> RLHF requires training multiple models, sampling from the LM policy during training, and careful hyperparameter tuning. It is computationally expensive, complex, and notoriously unstable — especially at scale.</div>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2>The core DPO insight</h2>
+  </div>
+
+  <div class="insight">
+    <strong>The key insight:</strong> There is a closed-form mapping between any reward function and its corresponding optimal policy under the KL-constrained objective. This means we can skip fitting a reward model entirely — and instead directly optimize the policy with a simple binary classification loss.
+  </div>
+
+  <p style="color:var(--muted); font-size:15px; margin: 18px 0 16px;">The paper proves that the language model itself implicitly <em>is</em> a reward model. There is no need for a separate reward network at all.</p>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>Property</th>
+        <th class="col-rlhf">RLHF + PPO</th>
+        <th class="col-dpo">DPO</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Separate reward model?</td>
+        <td class="col-rlhf"><span class="tag-bad">Yes — expensive</span></td>
+        <td class="col-dpo"><span class="tag-good">No — implicit</span></td>
+      </tr>
+      <tr>
+        <td>RL training loop?</td>
+        <td class="col-rlhf"><span class="tag-bad">Yes — PPO</span></td>
+        <td class="col-dpo"><span class="tag-good">No — classification loss</span></td>
+      </tr>
+      <tr>
+        <td>Sample from LM during training?</td>
+        <td class="col-rlhf"><span class="tag-bad">Yes — per step</span></td>
+        <td class="col-dpo"><span class="tag-good">No</span></td>
+      </tr>
+      <tr>
+        <td>Number of models trained</td>
+        <td class="col-rlhf"><span class="tag-bad">3+ (SFT + reward + policy)</span></td>
+        <td class="col-dpo"><span class="tag-good">1 (policy only)</span></td>
+      </tr>
+      <tr>
+        <td>Hyperparameter sensitivity</td>
+        <td class="col-rlhf"><span class="tag-bad">High — unstable</span></td>
+        <td class="col-dpo"><span class="tag-good">Low — robust</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 3 -->
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2>The math, simplified</h2>
+  </div>
+
+  <p style="color:var(--muted); font-size:15px; margin-bottom:18px;">The RLHF objective maximizes reward while penalizing KL-divergence from the reference policy:</p>
+
+  <div class="eq-block">
+    max<sub>π</sub>  𝔼[r(x,y)] − β · D<sub>KL</sub>[π(y|x) ‖ π<sub>ref</sub>(y|x)]
+    <div class="comment" style="margin-top:8px;">// β controls how far the policy can drift from the reference (SFT model)</div>
+  </div>
+
+  <p style="color:var(--muted); font-size:15px; margin: 16px 0;">The key derivation shows that the <strong style="color:var(--text)">optimal policy for this objective has a closed form</strong>:</p>
+
+  <div class="eq-block">
+    π*(y|x)  =  <span style="color:var(--accent3)">π<sub>ref</sub>(y|x)</span> · exp(<sup>1</sup>/<sub>β</sub> · r(x,y)) / Z(x)
+    <div class="comment" style="margin-top:8px;">// Z(x) is the partition function (normaliser) — hard to compute directly</div>
+  </div>
+
+  <div class="insight">
+    <strong>The trick:</strong> Rearranging this equation expresses the <em>reward</em> in terms of the <em>policy</em>:
+    <div class="eq-block" style="margin-top:12px; margin-bottom:0;">
+      r(x,y)  =  β · log[ π*(y|x) / π<sub>ref</sub>(y|x) ]  +  β · log Z(x)
+    </div>
+    When plugged into the Bradley-Terry preference model, <strong>Z(x) cancels out</strong> — the partition function disappears! This is the mathematical magic of DPO.
+  </div>
+
+  <!-- SECTION 4 -->
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2>The DPO loss function</h2>
+  </div>
+
+  <p style="color:var(--muted); font-size:15px; margin-bottom:18px;">Substituting the reparameterisation into the Bradley-Terry preference model gives the DPO objective — a single, clean binary cross-entropy loss:</p>
+
+  <div class="eq-block">
+    ℒ<sub>DPO</sub>(π<sub>θ</sub>; π<sub>ref</sub>)  =
+    <br/>&nbsp;&nbsp;−𝔼<sub>(x, y_w, y_l)∼D</sub>  log σ(
+    <br/>&nbsp;&nbsp;&nbsp;&nbsp;β · log <span style="color:var(--accent3)">π<sub>θ</sub>(y_w|x) / π<sub>ref</sub>(y_w|x)</span>
+    <br/>&nbsp;&nbsp;&nbsp;&nbsp;−
+    <br/>&nbsp;&nbsp;&nbsp;&nbsp;β · log <span style="color:var(--red)">π<sub>θ</sub>(y_l|x) / π<sub>ref</sub>(y_l|x)</span>
+    <br/>&nbsp;&nbsp;)
+    <div class="comment" style="margin-top:12px;">// y_w = winning (preferred) response, y_l = losing (dispreferred) response</div>
+    <div class="comment">// σ = sigmoid function | β = temperature / KL strength</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Intuitive interpretation</div>
+    <p>The loss increases the <span style="color:var(--accent3)">log-probability ratio of the preferred response</span> over the reference model, while decreasing the <span style="color:var(--red)">log-probability ratio of the dispreferred response</span>. The ratio acts as an implicit reward — if the policy assigns much higher probability to a response than the reference does, that response is implicitly given high reward.</p>
+  </div>
+
+  <!-- SECTION 5 -->
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h2>How the gradient works</h2>
+  </div>
+
+  <div class="insight">
+    <strong>The gradient has a crucial weighting term:</strong><br/>
+    ∇<sub>θ</sub>ℒ<sub>DPO</sub>  ∝  σ(<strong>r̂<sub>θ</sub>(x, y_l) − r̂<sub>θ</sub>(x, y_w)</strong>) · [∇ log π(y_w|x) − ∇ log π(y_l|x)]<br/><br/>
+    The sigmoid weight is <em>high</em> when the model wrongly ranks y_l above y_w (i.e. the model is making an error), and <em>low</em> when the model is already correct. This adaptive weighting prevents model degeneration that occurs with a naive probability ratio objective.
+  </div>
+
+  <div class="card">
+    <div class="card-title">What DPO is doing at each update step</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">↑</div>
+        <div class="step-body">
+          <h4>Increase likelihood of y_w (preferred response)</h4>
+          <p>Push the policy to assign more probability to the response humans preferred.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">↓</div>
+        <div class="step-body">
+          <h4>Decrease likelihood of y_l (dispreferred response)</h4>
+          <p>Push the policy away from the response humans didn't prefer.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">⚖️</div>
+        <div class="step-body">
+          <h4>Weight by how wrong the current model is</h4>
+          <p>Updates are larger when the implicit reward model currently gives the wrong ranking — focusing training effort where it's needed most.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 6 -->
+  <div class="section-header">
+    <span class="section-num">06</span>
+    <h2>DPO pipeline in practice</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Step-by-step DPO training</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1.</div>
+        <div class="step-body">
+          <h4>Start with an SFT model (π<sub>SFT</sub>)</h4>
+          <p>Fine-tune a pre-trained LM on high-quality demonstrations for your task. This becomes both the starting policy and the reference model π<sub>ref</sub>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2.</div>
+        <div class="step-body">
+          <h4>Collect (or reuse) a preference dataset</h4>
+          <p>You need triplets: (prompt x, winning response y_w, losing response y_l). You can reuse existing public datasets — no need to generate new samples.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3.</div>
+        <div class="step-body">
+          <h4>Optimise using the DPO loss</h4>
+          <p>Run standard gradient descent on ℒ<sub>DPO</sub>. No RL loop, no reward model inference, no sampling. Just supervised-style training with β ≈ 0.1 and RMSprop/Adam.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">💡</div>
+    <div class="callout-body"><strong>Tip:</strong> The paper uses β = 0.1 for most experiments, β = 0.5 for TL;DR summarization. Batch size = 64, learning rate = 1e-6, linear warmup over 150 steps using RMSprop. Very little hyperparameter tuning was needed.</div>
+  </div>
+
+  <!-- SECTION 7 -->
+  <div class="section-header">
+    <span class="section-num">07</span>
+    <h2>Experimental results</h2>
+  </div>
+
+  <p style="color:var(--muted); font-size:15px; margin-bottom:20px;">DPO was evaluated on three tasks: sentiment control (IMDb), summarization (Reddit TL;DR), and single-turn dialogue (Anthropic HH).</p>
+
+  <div class="results-grid">
+    <div class="result-card">
+      <div class="metric" style="color: var(--accent3);">61%</div>
+      <div class="label">DPO win rate vs. reference on TL;DR summarization<br/>(PPO: 57%)</div>
+    </div>
+    <div class="result-card">
+      <div class="metric" style="color: var(--accent);">58%</div>
+      <div class="label">Humans preferred DPO over PPO in head-to-head summarization evaluation</div>
+    </div>
+    <div class="result-card">
+      <div class="metric" style="color: var(--accent4);">&#x2265;Best</div>
+      <div class="label">DPO matches or exceeds PPO on all tasks, at far lower compute cost</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <div class="card-title">Key result highlights</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">✓</div>
+        <div class="step-body">
+          <h4>Sentiment control: DPO dominates</h4>
+          <p>DPO achieves the highest reward-vs-KL frontier across all tested hyperparameters — even beating PPO with access to ground-truth rewards (PPO-GT).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">✓</div>
+        <div class="step-body">
+          <h4>Summarization: more robust to temperature</h4>
+          <p>PPO's performance degrades sharply at high sampling temperatures. DPO is stable across all temperatures tested (0.0 to 1.0).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">✓</div>
+        <div class="step-body">
+          <h4>Dialogue: only DPO improves over chosen responses</h4>
+          <p>On Anthropic-HH, DPO is the only computationally efficient method that beats the preferred completions in the test set. PPO-based models failed to improve over the base Pythia-2.8B model.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">✓</div>
+        <div class="step-body">
+          <h4>Out-of-distribution generalization</h4>
+          <p>DPO trained on Reddit TL;DR generalises to CNN/DailyMail news articles (a different domain), outperforming PPO (GPT-4 win rate: DPO 36% vs PPO 26%).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 8 -->
+  <div class="section-header">
+    <span class="section-num">08</span>
+    <h2>The PyTorch implementation</h2>
+  </div>
+
+  <p style="color:var(--muted); font-size:15px; margin-bottom:16px;">The complete DPO loss fits in ~10 lines of PyTorch. This is remarkably simple compared to a full PPO implementation.</p>
+
+  <div class="code-block">
+<span class="kw">import</span> <span class="var">torch.nn.functional</span> <span class="kw">as</span> <span class="var">F</span>
+
+<span class="kw">def</span> <span class="fn">dpo_loss</span>(<span class="var">pi_logps</span>, <span class="var">ref_logps</span>, <span class="var">yw_idxs</span>, <span class="var">yl_idxs</span>, <span class="var">beta</span>):
+    <span class="cmt">"""</span>
+    <span class="cmt">pi_logps:  policy log-probs, shape (B,)</span>
+    <span class="cmt">ref_logps: reference model log-probs, shape (B,)</span>
+    <span class="cmt">yw_idxs:   preferred completion indices</span>
+    <span class="cmt">yl_idxs:   dispreferred completion indices</span>
+    <span class="cmt">beta:      KL penalty strength</span>
+    <span class="cmt">"""</span>
+    <span class="cmt"># Separate preferred / dispreferred log-probs</span>
+    <span class="var">pi_yw_logps</span>, <span class="var">pi_yl_logps</span>   <span class="op">=</span> <span class="var">pi_logps</span>[<span class="var">yw_idxs</span>],  <span class="var">pi_logps</span>[<span class="var">yl_idxs</span>]
+    <span class="var">ref_yw_logps</span>, <span class="var">ref_yl_logps</span> <span class="op">=</span> <span class="var">ref_logps</span>[<span class="var">yw_idxs</span>], <span class="var">ref_logps</span>[<span class="var">yl_idxs</span>]
+
+    <span class="cmt"># Log probability ratios (= implicit reward signals)</span>
+    <span class="var">pi_logratios</span>  <span class="op">=</span> <span class="var">pi_yw_logps</span>  <span class="op">-</span> <span class="var">pi_yl_logps</span>
+    <span class="var">ref_logratios</span> <span class="op">=</span> <span class="var">ref_yw_logps</span> <span class="op">-</span> <span class="var">ref_yl_logps</span>
+
+    <span class="cmt"># DPO loss: binary cross-entropy on the margin</span>
+    <span class="var">losses</span>  <span class="op">=</span> <span class="op">-</span><span class="fn">F.logsigmoid</span>(<span class="var">beta</span> <span class="op">*</span> (<span class="var">pi_logratios</span> <span class="op">-</span> <span class="var">ref_logratios</span>))
+
+    <span class="cmt"># Implicit rewards (for monitoring / logging)</span>
+    <span class="var">rewards</span> <span class="op">=</span> <span class="var">beta</span> <span class="op">*</span> (<span class="var">pi_logps</span> <span class="op">-</span> <span class="var">ref_logps</span>).<span class="fn">detach</span>()
+
+    <span class="kw">return</span> <span class="var">losses</span>, <span class="var">rewards</span>
+  </div>
+
+  <!-- SECTION 9 -->
+  <div class="section-header">
+    <span class="section-num">09</span>
+    <h2>Limitations &amp; future work</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Open questions raised by the authors</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">?</div>
+        <div class="step-body">
+          <h4>Out-of-distribution generalisation</h4>
+          <p>Initial results suggest DPO generalises similarly to PPO-based models, but more thorough study is needed. Can DPO use unlabelled prompts via self-labelling?</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">?</div>
+        <div class="step-body">
+          <h4>Reward over-optimisation</h4>
+          <p>How does reward hacking manifest in the DPO setting? The slight win-rate decrease seen later in training might be an early sign.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">?</div>
+        <div class="step-body">
+          <h4>Scaling to very large models</h4>
+          <p>Experiments ran up to 6B parameters. Applying DPO to models orders of magnitude larger is an exciting open direction.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">?</div>
+        <div class="step-body">
+          <h4>Beyond language</h4>
+          <p>DPO is a general preference optimisation technique. It could apply to generative models in image, audio, video, and other modalities.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 10 -->
+  <div class="section-header">
+    <span class="section-num">10</span>
+    <h2>Key takeaways</h2>
+  </div>
+
+  <div class="insight" style="margin-bottom:14px;">
+    <strong>1.</strong> DPO eliminates the need for a separate reward model and RL training loop by directly optimising a binary cross-entropy objective over preference pairs.
+  </div>
+  <div class="insight" style="margin-bottom:14px;">
+    <strong>2.</strong> The implicit reward is β · log[π_θ(y|x) / π_ref(y|x)]. The policy itself encodes the reward — no separate reward head needed.
+  </div>
+  <div class="insight" style="margin-bottom:14px;">
+    <strong>3.</strong> The gradient has an adaptive weighting: hard examples (where the model is wrong) get higher weight, preventing degeneration.
+  </div>
+  <div class="insight" style="margin-bottom:14px;">
+    <strong>4.</strong> DPO is provably equivalent to the standard RLHF objective but is dramatically simpler to train, more stable, and performs as well or better than PPO across sentiment, summarisation, and dialogue tasks.
+  </div>
+  <div class="insight">
+    <strong>5.</strong> The full implementation is ~10 lines of PyTorch with a single hyperparameter β. The barrier to aligning language models with human preferences just got much lower.
+  </div>
+
+  <hr/>
+  <p style="text-align:center; color:var(--muted); font-family:var(--mono); font-size:12px; padding-bottom:20px;">
+    Study notes based on: Rafailov et al., "Direct Preference Optimization: Your Language Model is Secretly a Reward Model", NeurIPS 2023 · arXiv:2305.18290
+  </p>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,8 @@
+[
+  {
+    "conversations": [
+      {"from": "human", "value": "Hello!"},
+      {"from": "assistant", "value": "Hi Sunny! How can I help?"}
+    ]
+  }
+]

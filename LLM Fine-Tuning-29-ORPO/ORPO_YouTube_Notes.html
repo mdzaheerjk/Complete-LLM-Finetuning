@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ORPO — YouTube Teaching Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0f11;
+    --surface: #161819;
+    --card: #1c1e21;
+    --border: rgba(255,255,255,0.08);
+    --accent: #f0a500;
+    --accent2: #4fa3e0;
+    --accent3: #7de8a8;
+    --accent4: #e06b6b;
+    --text: #e8e4da;
+    --muted: #7a7772;
+    --serif: 'DM Serif Display', Georgia, serif;
+    --sans: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.7;
+    padding: 0 1rem 4rem;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 5rem 0 3rem;
+    position: relative;
+  }
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.2rem;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    line-height: 1.15;
+    color: #fff;
+    margin-bottom: 1rem;
+  }
+  .hero h1 em { color: var(--accent); font-style: normal; }
+  .hero-sub {
+    font-size: 1.05rem;
+    color: var(--muted);
+    max-width: 560px;
+    margin-bottom: 2rem;
+  }
+  .hero-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 1px solid;
+  }
+  .badge-y { border-color: var(--accent); color: var(--accent); }
+  .badge-b { border-color: var(--accent2); color: var(--accent2); }
+  .badge-g { border-color: var(--accent3); color: var(--accent3); }
+
+  /* ── LAYOUT ── */
+  .page { max-width: 860px; margin: 0 auto; }
+  
+  /* ── SECTION HEADER ── */
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 3rem 0 1.2rem;
+  }
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    min-width: 28px;
+  }
+  .section-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-title {
+    font-family: var(--serif);
+    font-size: 1.75rem;
+    color: #fff;
+    margin-bottom: .4rem;
+  }
+  .section-desc {
+    color: var(--muted);
+    font-size: .92rem;
+    margin-bottom: 1.6rem;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.4rem 1.6rem;
+    margin-bottom: 1rem;
+  }
+  .card-title {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: .7rem;
+  }
+  .card h3 {
+    font-size: 1.05rem;
+    font-weight: 500;
+    margin-bottom: .5rem;
+    color: #fff;
+  }
+  .card p, .card li {
+    font-size: .93rem;
+    color: #c0bdb4;
+    line-height: 1.75;
+  }
+  .card ul { padding-left: 1.2rem; }
+  .card li { margin-bottom: .3rem; }
+
+  /* ── HIGHLIGHT CARD ── */
+  .card-accent {
+    border-left: 3px solid var(--accent);
+    background: rgba(240,165,0,.05);
+    border-top: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .card-blue {
+    border-left: 3px solid var(--accent2);
+    background: rgba(79,163,224,.05);
+    border-top: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .card-green {
+    border-left: 3px solid var(--accent3);
+    background: rgba(125,232,168,.05);
+    border-top: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .card-red {
+    border-left: 3px solid var(--accent4);
+    background: rgba(224,107,107,.05);
+    border-top: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── MATH / CODE ── */
+  .formula-box {
+    background: #111215;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.1rem 1.4rem;
+    margin: .8rem 0;
+    font-family: var(--mono);
+    font-size: .9rem;
+    color: var(--accent);
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .formula-box .comment {
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* ── COMPARISON TABLE ── */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 1rem 0;
+  }
+  .compare-col {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.2rem;
+  }
+  .compare-col.highlight { border-color: var(--accent); }
+  .compare-col-head {
+    font-family: var(--mono);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    padding-bottom: .6rem;
+    margin-bottom: .8rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .compare-col.highlight .compare-col-head { color: var(--accent); }
+  .compare-row {
+    font-size: .85rem;
+    padding: .3rem 0;
+    border-bottom: 1px solid rgba(255,255,255,.04);
+    color: #b0ada4;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .compare-row:last-child { border-bottom: none; }
+  .tick { color: var(--accent3); flex-shrink: 0; }
+  .cross { color: var(--accent4); flex-shrink: 0; }
+
+  /* ── STAT STRIP ── */
+  .stats-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin: 1rem 0;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    text-align: center;
+  }
+  .stat-num {
+    font-family: var(--serif);
+    font-size: 2rem;
+    color: var(--accent);
+    display: block;
+  }
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--muted);
+    margin-top: .2rem;
+    display: block;
+  }
+
+  /* ── PROCESS STEPS ── */
+  .steps { display: flex; flex-direction: column; gap: 2px; margin: 1rem 0; }
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 1rem 1.2rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .step-num {
+    font-family: var(--mono);
+    font-size: .75rem;
+    color: var(--accent);
+    background: rgba(240,165,0,.1);
+    border: 1px solid rgba(240,165,0,.25);
+    border-radius: 4px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-body h4 { font-size: .95rem; font-weight: 500; color: #fff; margin-bottom: .2rem; }
+  .step-body p { font-size: .88rem; color: #b0ada4; line-height: 1.65; }
+
+  /* ── CALLOUT ── */
+  .callout {
+    border-radius: 8px;
+    padding: 1rem 1.3rem;
+    margin: 1rem 0;
+    font-size: .92rem;
+  }
+  .callout-y { background: rgba(240,165,0,.08); border: 1px solid rgba(240,165,0,.2); color: #d0b070; }
+  .callout-b { background: rgba(79,163,224,.08); border: 1px solid rgba(79,163,224,.2); color: #7ab8e0; }
+  .callout strong { color: inherit; }
+
+  /* ── DIVIDER ── */
+  hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+
+  /* ── TAGS ── */
+  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: .8rem; }
+  .tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    padding: 3px 8px;
+    border-radius: 3px;
+    background: rgba(255,255,255,.06);
+    color: var(--muted);
+  }
+
+  /* ── TIMESTAMP ── */
+  .ts-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    background: rgba(240,165,0,.1);
+    border: 1px solid rgba(240,165,0,.2);
+    border-radius: 4px;
+    padding: 2px 8px;
+    display: inline-block;
+    margin-right: 6px;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    max-width: 860px;
+    margin: 4rem auto 0;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+    font-size: .82rem;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  @media (max-width: 600px) {
+    .compare-grid { grid-template-columns: 1fr; }
+    .stats-strip { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* Subtle animated underline on hero */
+  @keyframes underline-grow {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+  .hero h1 em::after {
+    content: '';
+    display: block;
+    height: 2px;
+    background: var(--accent);
+    transform-origin: left;
+    animation: underline-grow .8s ease .4s both;
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <p class="hero-eyebrow">🎬 YouTube Teaching Notes — NLP / LLM Alignment</p>
+  <h1>ORPO: Preference Optimisation<br>with <em>No Reference Model</em></h1>
+  <p class="hero-sub">A complete walkthrough of the ORPO paper (Hong, Lee & Thorne, KAIST AI, 2024) — structured to teach on camera, step by step.</p>
+  <div class="hero-badges">
+    <span class="badge badge-y">KAIST AI · 2024</span>
+    <span class="badge badge-b">arXiv:2403.07691</span>
+    <span class="badge badge-g">7B parameter results</span>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- ══════════════════════════ SECTION 1 ══════════════════════════ -->
+  <div class="section-label"><span class="section-num">01</span><div class="section-line"></div></div>
+  <h2 class="section-title">What's the problem?</h2>
+  <p class="section-desc">Start your video here — set the scene before diving into math.</p>
+
+  <div class="card card-red">
+    <div class="card-title">⚠ The Core Problem with Old Methods</div>
+    <p>State-of-the-art preference alignment (RLHF, DPO) requires <strong>two separate training stages</strong> plus a <strong>frozen reference model</strong> that sits in memory the entire time. This is expensive, slow, and fiddly.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔍 What is "Preference Alignment" anyway?</div>
+    <p>A language model pre-trained on web text can produce <em>harmful or unhelpful</em> outputs. Preference alignment teaches the model to prefer "good" responses (helpful, harmless) over "bad" ones. We train on pairs: a <strong>chosen</strong> response and a <strong>rejected</strong> response for the same prompt.</p>
+  </div>
+
+  <div class="card card-accent">
+    <div class="card-title">💡 Key Insight from the Paper</div>
+    <p>Standard supervised fine-tuning (SFT) trains on chosen responses using cross-entropy loss — but this <strong>inadvertently increases the likelihood of rejected responses too</strong>! The model generalises across styles it was never meant to learn. ORPO fixes this in a single training pass.</p>
+  </div>
+
+  <!-- ══════════════════════════ SECTION 2 ══════════════════════════ -->
+  <div class="section-label"><span class="section-num">02</span><div class="section-line"></div></div>
+  <h2 class="section-title">The training pipeline — old vs new</h2>
+  <p class="section-desc">Draw this on a whiteboard — it's very visual and audiences love it.</p>
+
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-col-head" style="color:var(--accent4);">RLHF</div>
+      <div class="compare-row"><span class="cross">✕</span> Pre-train model</div>
+      <div class="compare-row"><span class="cross">✕</span> SFT warm-up stage</div>
+      <div class="compare-row"><span class="cross">✕</span> Train reward model</div>
+      <div class="compare-row"><span class="cross">✕</span> PPO reinforcement loop</div>
+      <div class="compare-row"><span class="cross">✕</span> Frozen reference model</div>
+      <div class="compare-row" style="color:var(--muted);font-size:.8rem;margin-top:.5rem;">4 forward passes / batch</div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-col-head" style="color:var(--accent2);">DPO</div>
+      <div class="compare-row"><span class="tick">✓</span> Pre-train model</div>
+      <div class="compare-row"><span class="cross">✕</span> SFT warm-up stage</div>
+      <div class="compare-row"><span class="tick">✓</span> No reward model needed</div>
+      <div class="compare-row"><span class="cross">✕</span> Still needs SFT ref model</div>
+      <div class="compare-row" style="color:var(--muted);font-size:.8rem;margin-top:.5rem;">4 forward passes / batch</div>
+    </div>
+    <div class="compare-col highlight">
+      <div class="compare-col-head">ORPO ★</div>
+      <div class="compare-row"><span class="tick">✓</span> Pre-train model</div>
+      <div class="compare-row"><span class="tick">✓</span> Single training stage</div>
+      <div class="compare-row"><span class="tick">✓</span> No reward model</div>
+      <div class="compare-row"><span class="tick">✓</span> No reference model</div>
+      <div class="compare-row" style="color:var(--accent3);font-size:.8rem;margin-top:.5rem;">2 forward passes / batch</div>
+    </div>
+  </div>
+
+  <div class="callout callout-b">
+    <strong>Talking point:</strong> ORPO cuts memory usage roughly in half compared to DPO and RLHF because there's no frozen reference model sitting in GPU memory. That matters a lot at 7B parameters.
+  </div>
+
+  <!-- ══════════════════════════ SECTION 3 ══════════════════════════ -->
+  <div class="section-label"><span class="section-num">03</span><div class="section-line"></div></div>
+  <h2 class="section-title">Why SFT alone fails at alignment</h2>
+  <p class="section-desc">The paper's key empirical observation — great for a screen recording showing Figure 3.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-body">
+        <h4>SFT uses cross-entropy loss</h4>
+        <p>For each token position, we minimise <code>−log P(correct token)</code>. Non-answer tokens get a gradient of <em>zero</em> — they are neither rewarded nor penalised.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-body">
+        <h4>Domain generalisation is a double-edged sword</h4>
+        <p>Training on helpful responses teaches the model the <em>style</em> of that domain (e.g., conversational dialogue). That same style appears in <em>rejected</em> responses too, so their probabilities also go up.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-body">
+        <h4>Empirical proof (Figure 3 in the paper)</h4>
+        <p>The authors fine-tuned OPT-350M on <em>only chosen responses</em> from HH-RLHF. Both chosen and rejected log-probabilities rose simultaneously — the rejected responses were becoming nearly as likely as chosen ones.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-body">
+        <h4>Solution: add a weak penalty</h4>
+        <p>We don't need to brutally suppress rejected responses — a <em>mild, dynamic</em> penalty on the odds ratio is enough, and it doesn't destabilise the fine-tuning.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════ SECTION 4 ══════════════════════════ -->
+  <div class="section-label"><span class="section-num">04</span><div class="section-line"></div></div>
+  <h2 class="section-title">The ORPO loss function — step by step</h2>
+  <p class="section-desc">Slowest section — take your time here, write each equation live.</p>
+
+  <div class="card card-blue">
+    <div class="card-title">📐 Building Block 1 — Log-likelihood</div>
+    <h3>Average log-likelihood of a response</h3>
+    <div class="formula-box">log Pθ(y|x) = (1/m) Σ log Pθ(yₜ | x, y&lt;t)
+
+<span class="comment">  m = sequence length
+  We average over all token positions.</span></div>
+    <p>This is the standard language model probability: the probability of generating the whole response, factored as a product of token-wise probabilities.</p>
+  </div>
+
+  <div class="card card-blue">
+    <div class="card-title">📐 Building Block 2 — Odds</div>
+    <h3>The odds of a response</h3>
+    <div class="formula-box">oddsθ(y|x) = Pθ(y|x) / (1 − Pθ(y|x))
+
+<span class="comment">  If odds = 3, the model is 3× more likely
+  to generate y than NOT to generate y.</span></div>
+    <p>Odds are more sensitive than raw probability when probabilities are near 1 — exactly where we are after SFT starts adapting.</p>
+  </div>
+
+  <div class="card card-blue">
+    <div class="card-title">📐 Building Block 3 — Odds Ratio</div>
+    <h3>Chosen vs rejected odds ratio</h3>
+    <div class="formula-box">ORθ(yw, yl) = oddsθ(yw|x) / oddsθ(yl|x)
+
+<span class="comment">  yw = chosen (winner) response
+  yl = rejected (loser) response
+  High OR means the model strongly prefers yw.</span></div>
+  </div>
+
+  <div class="card card-accent">
+    <div class="card-title">⭐ The Full ORPO Objective</div>
+    <h3>Lₒᵣₚₒ = 𝔼 [ L_SFT + λ · L_OR ]</h3>
+    <div class="formula-box">L_SFT = standard NLL loss on chosen responses
+
+L_OR  = −log σ( log[ oddsθ(yw|x) / oddsθ(yl|x) ] )
+
+<span class="comment">  σ = sigmoid function
+  λ = weighting hyperparameter (paper uses 0.1–0.25)
+  
+  Minimising L_OR ↔ maximising the log odds ratio
+  ↔ making chosen much more likely than rejected.</span></div>
+    <p>Two jobs at once: <strong>L_SFT</strong> adapts the model to the domain. <strong>L_OR</strong> simultaneously pushes chosen responses up and rejected responses down.</p>
+  </div>
+
+  <div class="callout callout-y">
+    <strong>Why sigmoid?</strong> Wrapping the log odds ratio in log-sigmoid keeps the loss bounded and smooth. It's the same trick used in logistic regression and in DPO's objective.
+  </div>
+
+  <!-- ══════════════════════════ SECTION 5 ══════════════════════════ -->
+  <div class="section-label"><span class="section-num">05</span><div class="section-line"></div></div>
+  <h2 class="section-title">Why "odds ratio" and not "probability ratio"?</h2>
+  <p class="section-desc">This is the subtlest section — use Figure 6 from the paper on screen.</p>
+
+  <div class="card">
+    <div class="card-title">🔬 Probability Ratio (used in DPO-like methods)</div>
+    <div class="formula-box">PRθ(yw, yl) = Pθ(yw|x) / Pθ(yl|x)</div>
+    <p>When probabilities are small (early in training before domain adaptation), even a small difference produces an <em>extremely large</em> or <em>extremely small</em> ratio. The distribution of log PR is very sharp and narrow around zero — small changes produce extreme gradients.</p>
+  </div>
+
+  <div class="card card-accent">
+    <div class="card-title">✅ Odds Ratio (used in ORPO)</div>
+    <div class="formula-box">ORθ(yw, yl) = [P(yw)/(1−P(yw))] / [P(yl)/(1−P(yl))]</div>
+    <p>The log odds ratio has a much <em>wider, flatter distribution</em> than the log probability ratio. This means:</p>
+    <ul style="padding-left:1.2rem;margin-top:.5rem;">
+      <li>Gradients are gentler — less risk of suppressing rejected responses so hard the model degenerates</li>
+      <li>Better suited when SFT and preference learning happen together (probabilities haven't settled yet)</li>
+      <li>Empirically verified: probability ratio training causes log-prob of rejected responses to collapse below –4 rapidly; odds ratio keeps it stable</li>
+    </ul>
+  </div>
+
+  <!-- ══════════════════════════ SECTION 6 ══════════════════════════ -->
+  <div class="section-label"><span class="section-num">06</span><div class="section-line"></div></div>
+  <h2 class="section-title">Gradient intuition</h2>
+  <p class="section-desc">Optional deep-dive — skip if your audience is less mathematical.</p>
+
+  <div class="card card-blue">
+    <div class="card-title">🧮 Gradient of L_OR = δ(d) × h(d)</div>
+    <p><strong>δ(d)</strong> — the "penalty scaler". It approaches 0 when the model already strongly prefers chosen over rejected. It is large (fast updates) when the model still ranks rejected highly. Think of it as <em>adaptive learning rate based on current preference quality</em>.</p>
+    <br>
+    <p><strong>h(d)</strong> — the "contrastive direction". It points the gradient toward: increasing chosen likelihood AND decreasing rejected likelihood. The denominator terms (1 − P(y|x)) amplify gradients where the respective probability is currently low, creating a self-accelerating catch-up mechanism.</p>
+  </div>
+
+  <!-- ══════════════════════════ SECTION 7 ══════════════════════════ -->
+  <div class="section-label"><span class="section-num">07</span><div class="section-line"></div></div>
+  <h2 class="section-title">Results — the numbers</h2>
+  <p class="section-desc">Show the AlpacaEval table on screen; reference Figure 1 and Table 1.</p>
+
+  <div class="stats-strip">
+    <div class="stat-card">
+      <span class="stat-num">12.20%</span>
+      <span class="stat-label">AlpacaEval 2.0 win rate<br>Mistral-ORPO-β (7B)</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num">7.32</span>
+      <span class="stat-label">MT-Bench score<br>Mistral-ORPO-β (7B)</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num">66.19%</span>
+      <span class="stat-label">IFEval instruction-level<br>loose accuracy</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num">1</span>
+      <span class="stat-label">Training epoch<br>on UltraFeedback only</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📊 What beats what</div>
+    <ul>
+      <li><strong>Mistral-ORPO-β (7B)</strong> beats Zephyr-β (7B) on AlpacaEval 2.0 — trained with far less data (61K vs 200K+ examples)</li>
+      <li><strong>Llama-2-ORPO (7B)</strong> beats Llama-2-Chat (13B) — a 7B model surpassing a 13B model trained with RLHF</li>
+      <li><strong>Phi-2-ORPO (2.7B)</strong> beats Llama-2-Chat (7B) despite being a much smaller model</li>
+    </ul>
+  </div>
+
+  <div class="card card-accent">
+    <div class="card-title">🏆 Key Takeaway for Your Viewers</div>
+    <p>ORPO achieves state-of-the-art results with <strong>one stage, one dataset, one epoch</strong> — and about half the compute of DPO/RLHF. The win rate against DPO also <em>increases with model size</em>, suggesting ORPO scales well.</p>
+  </div>
+
+  <!-- ══════════════════════════ SECTION 8 ══════════════════════════ -->
+  <div class="section-label"><span class="section-num">08</span><div class="section-line"></div></div>
+  <h2 class="section-title">Datasets & experimental setup</h2>
+  <p class="section-desc">Keep this brief on camera — a quick slide is enough.</p>
+
+  <div class="compare-grid">
+    <div class="compare-col" style="grid-column:1/2;">
+      <div class="compare-col-head" style="color:var(--accent2);">Datasets used</div>
+      <div class="compare-row">Anthropic HH-RLHF</div>
+      <div class="compare-row">Binarized UltraFeedback</div>
+      <div class="compare-row">UltraFeedback-cleaned (Argilla)</div>
+    </div>
+    <div class="compare-col" style="grid-column:2/4;">
+      <div class="compare-col-head" style="color:var(--accent2);">Models tested</div>
+      <div class="compare-row"><span class="tick">→</span> OPT 125M, 350M, 1.3B (ablation)</div>
+      <div class="compare-row"><span class="tick">→</span> Phi-2 (2.7B)</div>
+      <div class="compare-row"><span class="tick">→</span> Llama-2 (7B)</div>
+      <div class="compare-row"><span class="tick">→</span> Mistral (7B) → Mistral-ORPO-α & β</div>
+    </div>
+  </div>
+
+  <div class="callout callout-b">
+    <strong>Hyperparameter note for viewers:</strong> λ = 0.1–0.25 worked best. A higher λ (e.g. 1.0) makes the model great at open-ended tasks but hurts on math/coding where deterministic answers matter. Tune carefully!
+  </div>
+
+  <!-- ══════════════════════════ SECTION 9 ══════════════════════════ -->
+  <div class="section-label"><span class="section-num">09</span><div class="section-line"></div></div>
+  <h2 class="section-title">Lexical diversity analysis</h2>
+  <p class="section-desc">Interesting bonus finding — great for filling ~2 minutes on camera.</p>
+
+  <div class="card">
+    <div class="card-title">📝 Per-Input Diversity (PID)</div>
+    <p>When asked the same prompt multiple times, ORPO models give <em>more consistent</em> answers (higher cosine similarity between outputs) compared to DPO. ORPO assigns high probability to the "right" answer rather than spreading probability across many alternatives.</p>
+  </div>
+  <div class="card">
+    <div class="card-title">📝 Across-Input Diversity (AID)</div>
+    <p>Across different prompts, ORPO models produce <em>more varied</em> answers — they tailor responses specifically to each instruction rather than defaulting to a generic style. DPO models are more "one-size-fits-all" in their generation style.</p>
+  </div>
+  <div class="callout callout-y">
+    <strong>Interpretation:</strong> ORPO makes models both more <em>reliable</em> (consistent within a task) and more <em>instructable</em> (responsive to different prompts). That's a desirable combination for deployed assistants.
+  </div>
+
+  <!-- ══════════════════════════ SECTION 10 ══════════════════════════ -->
+  <div class="section-label"><span class="section-num">10</span><div class="section-line"></div></div>
+  <h2 class="section-title">Limitations & future work</h2>
+  <p class="section-desc">Always cover this — builds credibility with your audience.</p>
+
+  <div class="card card-red">
+    <div class="card-title">⚠ Honest Caveats</div>
+    <ul>
+      <li>RLHF and DPO have many variants (IPO, KTO, etc.) that were not compared in this paper</li>
+      <li>Experiments capped at 7B parameters — larger scaling not yet verified</li>
+      <li>Fine-tuning datasets were mostly single-domain (UltraFeedback) — generalisation across diverse domains untested</li>
+      <li>The internal mechanism by which ORPO affects the model's representations is not yet studied</li>
+    </ul>
+  </div>
+
+  <!-- ══════════════════════════ SECTION 11 ══════════════════════════ -->
+  <div class="section-label"><span class="section-num">11</span><div class="section-line"></div></div>
+  <h2 class="section-title">Suggested video structure</h2>
+  <p class="section-desc">Timestamps you can use in your YouTube description.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num"><span class="ts-label">0:00</span></div>
+      <div class="step-body">
+        <h4>Hook + Problem Statement</h4>
+        <p>Why does aligning LLMs take 3 stages and 2 models? Isn't there a better way?</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num"><span class="ts-label">2:00</span></div>
+      <div class="step-body">
+        <h4>RLHF vs DPO vs ORPO — Pipeline comparison</h4>
+        <p>Draw the three pipelines side by side. Emphasise compute savings.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num"><span class="ts-label">6:00</span></div>
+      <div class="step-body">
+        <h4>Why SFT breaks alignment (the log-prob experiment)</h4>
+        <p>Show Figure 3 on screen. Explain the cross-entropy blind spot.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num"><span class="ts-label">10:00</span></div>
+      <div class="step-body">
+        <h4>The ORPO loss — building up the math</h4>
+        <p>Go slowly: log-likelihood → odds → odds ratio → the full objective.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num"><span class="ts-label">16:00</span></div>
+      <div class="step-body">
+        <h4>Why odds ratio, not probability ratio?</h4>
+        <p>Show Figure 6 (distribution plots). This is the key theoretical contribution.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num"><span class="ts-label">20:00</span></div>
+      <div class="step-body">
+        <h4>Results — the numbers and benchmarks</h4>
+        <p>AlpacaEval table, MT-Bench spider chart, win rate tables. Keep it visual.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num"><span class="ts-label">26:00</span></div>
+      <div class="step-body">
+        <h4>λ ablation + diversity analysis + limitations</h4>
+        <p>How to pick λ. Briefly cover PID/AID. Honest limitations.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num"><span class="ts-label">30:00</span></div>
+      <div class="step-body">
+        <h4>Summary + where to find the code</h4>
+        <p>github.com/xfactlab/orpo and HuggingFace checkpoints. Call to action.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════ SECTION 12 ══════════════════════════ -->
+  <div class="section-label"><span class="section-num">12</span><div class="section-line"></div></div>
+  <h2 class="section-title">Quick-reference cheatsheet</h2>
+  <p class="section-desc">Pin this to your second monitor while recording.</p>
+
+  <div class="card">
+    <div class="card-title">📋 One-page summary</div>
+    <div class="formula-box">WHAT:  Monolithic preference alignment — no reference model needed.
+
+HOW:   Add an odds ratio penalty term to the SFT cross-entropy loss.
+       L_ORPO = L_SFT + λ · L_OR
+       L_OR = −log σ( log[ odds(chosen) / odds(rejected) ] )
+
+WHY:   SFT alone raises both chosen AND rejected probabilities.
+       The OR term gently but consistently penalises rejected outputs.
+
+ODDS:  odds(y|x) = P(y|x) / (1 − P(y|x))
+       Odds ratio is more stable than probability ratio during early training.
+
+λ:     0.1 for Mistral (7B), 0.2 for Llama-2 (7B), 0.25 for Phi-2 (2.7B)
+       Higher λ → better open-ended → weaker math/code
+
+COST:  ~50% fewer forward passes vs RLHF/DPO per batch.
+       No separate SFT stage. No frozen reference model in memory.</div>
+  </div>
+
+  <div class="tag-row">
+    <span class="tag">LLM Alignment</span>
+    <span class="tag">Preference Learning</span>
+    <span class="tag">SFT</span>
+    <span class="tag">DPO</span>
+    <span class="tag">RLHF</span>
+    <span class="tag">Odds Ratio</span>
+    <span class="tag">Mistral 7B</span>
+    <span class="tag">Llama-2</span>
+    <span class="tag">KAIST AI</span>
+    <span class="tag">UltraFeedback</span>
+  </div>
+
+</div>
+
+<div class="footer">
+  <span>Notes generated from: arXiv:2403.07691v2 — Hong, Lee & Thorne (2024)</span>
+  <span>For educational use · youtube teaching notes</span>
+</div>
+
+</body>
+</html>

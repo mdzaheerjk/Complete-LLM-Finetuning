@@ -1,0 +1,39 @@
+# base_sft_lora.yaml
+base_model: meta-llama/Llama-2-7b-hf
+
+# ===== Training type =====
+training_type: sft
+
+# ===== LoRA config =====
+adapter: lora
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+lora_target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - up_proj
+  - down_proj
+
+# ===== Precision & memory =====
+fp16: true
+bf16: false
+gradient_checkpointing: true
+
+# ===== Dataset =====
+datasets:
+  - path: timdettmers/openassistant-guanaco
+    type: chat_template
+
+sequence_len: 2048
+micro_batch_size: 1
+gradient_accumulation_steps: 8
+
+# ===== Optimizer =====
+optimizer: adamw_torch
+learning_rate: 2e-4
+
+output_dir: ./outputs/sft-lora

@@ -1,0 +1,11 @@
+# fsdp.yaml (changes only)
+
+distributed_type: fsdp
+
+fsdp:
+  sharding_strategy: FULL_SHARD
+  auto_wrap_policy: transformer
+  state_dict_type: full
+  sync_module_states: true
+
+gradient_checkpointing: true
